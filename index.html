@@ -158,6 +158,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-hud-item.combo b{color:var(--accent)}
 .m-panel{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#140e1c,#241a2e);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px;text-align:center;overflow-y:auto}
 .m-inner{margin:auto;width:100%;max-width:380px}
+.m-level-desc{font-size:12px;color:var(--accent);font-weight:600;line-height:1.5;max-width:340px;margin:0 auto 12px}
 .m-panel .big{font-size:40px;margin-bottom:6px}
 .m-panel h3{font-size:20px;font-weight:700;margin-bottom:8px}
 .m-panel p{font-size:13px;color:var(--text-dim);line-height:1.6;max-width:340px;margin:0 auto 14px}
@@ -227,7 +228,8 @@ body.playing #top-chrome,body.playing .foot{display:none}
       <div class="m-inner">
         <div class="big">🌠</div>
         <h3>Meteor Mode</h3>
-        <p>落ちてくる日本語の意味を、着地する前にタップ。正解も不正解もそのまま復習スケジュールに反映されます。</p>
+        <p class="m-level-desc" id="m-level-desc"></p>
+        <p>Tap the falling word that matches the meaning shown. Right or wrong, every answer feeds your spaced-repetition review.</p>
         <div class="cats" id="cats">
           <button class="cat on" data-cat="vocab" onclick="setCat('vocab')">Vocabulary</button>
           <button class="cat" data-cat="grammar" onclick="setCat('grammar')">Grammar</button>
@@ -236,7 +238,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         </div>
         <div class="m-summary" id="m-summary"></div>
         <div class="m-prog-bar"><div class="m-prog-fill" id="m-prog-fill" style="width:0%"></div></div>
-        <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ スタート</button></p>
+        <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
         <div><button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button></div>
       </div>
     </div>
@@ -262,7 +264,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-stars" id="m-stars">☆☆☆</div>
         <h3 id="m-result-title"></h3>
         <p id="m-result-sub"></p>
-        <button class="m-play" onclick="startMeteor()">もう一度</button>
+        <button class="m-play" onclick="startMeteor()">Play again</button>
       </div>
     </div>
   </div>
@@ -803,6 +805,14 @@ function say(text,lang){
   speechSynthesis.speak(u);
 }
 
+/* ---- official JLPT level competence (jlpt.jp) ---- */
+const LEVEL_DESC={
+  N5:'N5 · Understand basic Japanese: typical expressions and sentences in hiragana, katakana, and basic kanji.',
+  N4:'N4 · Understand passages on familiar daily topics written in basic vocabulary and kanji.',
+  N3:'N3 · Understand written materials with everyday content, and grasp the gist of more complex texts.',
+  N2:'N2 · Understand a range of topics written clearly, such as newspaper articles and commentaries.'
+};
+
 /* ---- stats (start-screen summary) ---- */
 function refreshStats(){
   const items=cards();
@@ -810,6 +820,8 @@ function refreshStats(){
   const known=items.filter(i=>{const c=mem[i.id];return c&&c.reps>=3&&!isDue(i.id);}).length;
   const pct=items.length?Math.round(known/items.length*100):0;
   const st=(gdata.stars&&gdata.stars[gkey()])||0;
+  const dEl=document.getElementById('m-level-desc');
+  if(dEl)dEl.textContent=LEVEL_DESC[level]||'';
   const sEl=document.getElementById('m-summary');
   if(sEl)sEl.innerHTML='Due <b>'+due+'</b> · Mastered <b>'+known+'/'+items.length+'</b> · Best <b>'+bestScore()+
     '</b> <span class="stars">'+(st?'★'.repeat(st)+'☆'.repeat(3-st):'☆☆☆')+'</span>';
@@ -1041,7 +1053,7 @@ function endMeteor(){
   document.getElementById('m-stars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
   document.getElementById('m-result-title').textContent=mCorrect+' / '+mTotal+' correct';
   document.getElementById('m-result-sub').textContent='Score '+mScore+' · Best '+bestScore()+'. '+
-    (stars>=3?'完璧！この調子で次のレベルへ。':stars>=2?'good。あと一歩で完璧。':stars>=1?'間違えた語はまた早めに出てきます。':'落ち着いてもう一度。');
+    (stars>=3?'Perfect! Move on to the next level.':stars>=2?'Great — almost perfect.':stars>=1?'Missed words will come back sooner.':'Take your time and try again.');
   document.getElementById('m-best').textContent=bestScore();
   refreshStats();
 }
