@@ -13,7 +13,9 @@
 
 ## アーキテクチャ
 - `index.html` 1ファイルに HTML + CSS + Vanilla JS を内包。フレームワーク・ビルドツールなし。
-- 学習データは `DATA` オブジェクト（N5〜N2 × vocab/grammar/hiragana/kanji）。
+- 学習データは `DATA` オブジェクト（N5〜N2 × vocab/grammar/hiragana/kanji）。約446エントリ（各レベル: 語彙~30・文法~18・漢字22-34・かな12-46）。
+  - `hiragana` キーは「かな」全般を格納（N5=ひらがな46, N4=カタカナ46, N3=濁音/拗音, N2=表記ルール）。UIラベルは「Kana」。データキーは互換のため `hiragana` のまま。
+  - データは `/tmp/gen_data.py`(セッション限り) のような構造化スクリプトから生成する運用も可。各 `id` は `<lvl><v|g|h|k><n>` で一意。`ex` は現状ゲームでは未使用（将来の詳細表示用に保持）。
 - 間隔反復は SM-2 アルゴリズム。進捗は localStorage キー `jlpt-sr-v1` に保存。
 - **UIは全画面の Meteor Mode 単一**（Infinite Japanese風の落下ゲーム）。旧 Language/Reading/Listening は撤去済み。
   - **複数隕石の同時落下（ウェーブ制）**: 上部プロンプトに正解の意味(英語)を表示し、2〜4個の日本語(jp+kana)隕石がレーン/速度をずらして同時落下。意味が一致する隕石をタップ。
