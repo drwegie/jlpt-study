@@ -1,0 +1,104 @@
+# JLPT Study — リテンション改修プラン
+
+## 設計思想（市場調査より）
+- **Duolingoの失敗**: 報酬が学習の「外側」（ストリーク/XP）→ 数字を守る義務化 → 飽き・一気離脱。
+- **Infinite Japaneseの成功**: 報酬が学習の「内側」。隕石が落ちる緊張・音/絵/文字の同時提示・熟達ゲート。
+- **方針**: 外付け報酬を貼らず、**復習行為そのものをゲーム化**する。結果は既存SM-2エンジンに直結させる。
+
+## 制約（CLAUDE.md / メモリ）
+- GitHub Pages 静的サイト。バックエンドなし。`index.html` 単一ファイルで完結。外部依存なし。
+- 状態は localStorage。既存キー `jlpt-sr-v1`（SM-2）は壊さない。ゲーム状態は新キー `jlpt-game-v1`。
+
+---
+
+## 🌠 中核: Meteor Mode（落下ゲーム型学習）
+
+第4のセクションタブ「Meteor」を追加。既存 `DATA` / `mem`(SM-2) をそのまま活用。
+
+### ゲームメカニクス
+- 日本語の単語タイル（隕石）が画面上から落下。タイルに jp + kana を表示し、spawn時に `say(jp)` で読み上げ（**音・文字の同時提示**）。
+- 画面下に意味の選択肢ボタン（既存 `makeOpts` 流用、4択）。落ちきる前に正解の意味をタップ。
+- **正解**: 隕石が爆発（演出）、コンボ++、スコア加算、`update(id, 速さに応じ2〜3)`。
+- **ミス/落下**: 画面フラッシュ、コンボリセット、`update(id, 0)` → SM-2で「もう一度」キューへ。**ハードな失敗(ライフ制)は入れない**（＝Duolingoの罠回避）。
+- 出題順は `buildQueue()` 同様 due 優先。1ラウンド ≈ 10語。
+- **フロー**: コンボ/ラウンド進行で落下速度が上がる。速いほど高得点（熟達インセンティブ）。
+- **熟達ゲート**: ラウンド終了時に精度で★1〜3。Infiniteの「★取るまで足踏み」感を結果画面で表現。
+
+### 既存学習エンジンとの接続が肝
+ゲームの正誤がそのまま SM-2 の due/interval を更新 → 「遊んだら復習が進む」を実現。
+
+---
+
+## Phase 1 — Meteor Mode コア（今回の主実装）
+- [ ] セクションタブに「Meteor」追加（`setSection` / 表示切替ロジック拡張）
+- [ ] `#meteor-area` プレイフィールド + 落下アニメ（requestAnimationFrame + CSS transform）
+- [ ] 隕石タイル（jp/kana表示・spawn時に音声）
+- [ ] 下部4択（`makeOpts` 流用）・正誤判定・落下タイムアウト判定
+- [ ] スコア / コンボ表示（セッション内・即時フィードバック）
+- [ ] 正誤の SM-2 連携（`update(id,q)`）
+- [ ] ラウンド終了の★結果画面（精度ベース）
+- [ ] 正解=爆発演出 / ミス=フラッシュ（CSSのみ、軽量）
+- [ ] サウンドON/OFFトグル（既存 `say` と効果音、初期OFF）+ `prefers-reduced-motion` 尊重
+- [ ] localStorage `jlpt-game-v1`（レベル/カテゴリ別ベストスコア・最高★）
+
+## Phase 2 — 健全な定着フック（任意・後続）
+- [ ] 学習カレンダー（草風ヒートマップ。義務でなく積み上げの可視化。プレッシャー無し）
+- [ ] 穏やかなストリーク表示（折れても罰しない・通知圧なし）
+- [ ] コンボ演出強化 / confetti / 効果音バリエーション
+
+## 入れないもの（飽きの原因そのもの）
+- ❌ ハート/ライフ/エナジー制
+- ❌ 強制デイリーゴール・ストリーク維持の通知圧
+- ❌ 学習の外側で完結する純粋な収集バッジの乱発
+
+---
+
+## 検証（Done条件）
+- [ ] ブラウザで `index.html` を開き Meteor Mode を実プレイ。落下・正誤・★・SM-2反映を目視確認。
+- [ ] 既存3モード（Language/Reading/Listening）と `jlpt-sr-v1` が無傷なこと。
+- [ ] レベル/カテゴリ切替・リセットが Meteor Mode でも整合。
+- [ ] モバイル幅（max 560px）でレイアウト崩れなし。
+
+## Review（Phase 1 完了）
+`index.html` 単一ファイル内に Meteor Mode を実装。外部依存なし・GitHub Pagesのまま動作。
+
+### 実装内容
+- セクションタブに「🌠 Meteor」追加。`setSection`/`start` を拡張し、離脱時は `stopMeteor()` でループ停止。カテゴリchipsは lang/meteor で表示。
+- 落下ゲーム: `requestAnimationFrame` で隕石(jp+kana)が落下、spawn時に `say()` 読み上げ。下部4択から着地前にタップ。
+- スコア/コンボHUD。コンボ・ラウンド進行で落下速度UP（フロー）。早く正解するほど高得点。
+- **SM-2直結**: 正解=`update(id, 速さで2〜3)`、誤答/落下=`update(id,0)`。遊ぶと復習が前進。
+- ラウンド終了で精度→★1〜3の結果画面（熟達ゲート感）。
+- 演出: 正解=boom、誤答/落下=crash+sky flash。`prefers-reduced-motion` 尊重。
+- サウンドON/OFFトグル（読み上げ＋WebAudioの軽いblip）。設定は永続化。
+- 新キー `jlpt-game-v1` にレベル/カテゴリ別ベストスコア・最高★・サウンド設定を保存。既存 `jlpt-sr-v1` は不変。
+
+### 検証（ブラウザ実プレイ, localhost:4173）
+- ✅ 正解: score 20 / combo 1 / boom / SM-2 reps 0→1・due繰り延べ
+- ✅ 誤答: combo 0復帰 / sky flash / SM-2 q=0でreps0・iv1
+- ✅ 結果画面: 7/8=★2、best 235とstars 2を `jlpt-game-v1` に保存、サウンド設定も永続
+- ✅ 既存3モード(Language/Reading/Listening)無傷、`jlpt-sr-v1` 独立保持
+- ✅ セクション離脱でゲームループ停止、レベル/カテゴリ切替で開始画面へ
+- ✅ コンソールエラーなし、レイアウト崩れなし（テーマ馴染み良好）
+
+### 未実装（Phase 2 候補）
+- 学習カレンダー（草風ヒートマップ）/ 穏やかなストリーク / confetti等の演出強化
+- 複数隕石同時落下（よりInfinite Japanese寄りの操作）は要検討
+
+---
+
+## 追加改修: 全画面UI化（Infinite Japanese風）— 完了
+ユーザー要望「ゲーム枠が小さい・ヘッダーが画面半分を占める」「Language/Reading/Listeningは不要」に対応。
+
+### 変更内容
+- Language/Reading/Listening セクションと section タブを**完全撤去**。アプリは Meteor Mode 単一に。
+- 関連する死にコード（flashcard/reading/listening のJS・HTML・上部stats/progress）を削除。
+- `.wrap` をフレックス縦カラム化し全画面レイアウトに。プレイ中は `body.playing` で `#top-chrome`・footer を隠し、`.m-sky` を `flex:1` で画面いっぱいに（検証時 viewport の76%）。
+- 開始画面: 宇宙背景パネルにカテゴリ選択 + サマリー（Due/Mastered/Best+★）+ プログレスバー + 大きなスタートボタン。短い画面でも崩れないよう `.m-panel` を `overflow-y:auto` + `.m-inner` margin:auto センタリング。
+- 宇宙テーマ強化: radial-gradientの星空 + 隕石グロー。HUDはプレイ画面上部に移動。
+
+### 検証（ブラウザ実プレイ）
+- ✅ プレイ中: top-chrome/footer非表示、sky が viewport の76%を占有、4択2x2、隕石落下・グロー
+- ✅ 正解クリックで score加算・combo更新・SM-2 reps前進
+- ✅ 結果画面: ★算出・playing解除でchrome復帰
+- ✅ レベル切替で開始画面へ復帰しサマリー更新（N4: Due0/Mastered0/5/Best90★★☆）
+- ✅ 短い viewport(415px)でもスタートボタン到達可、コンソールエラーなし
