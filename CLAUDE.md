@@ -23,7 +23,10 @@
   - 1ウェーブ=1ターゲット語、1ラウンド=最大 `ROUND`(=10) ウェーブ。正誤は `update(id,q)` で SM-2 に直結。
   - 主要関数: `nextWave`/`mLoop`(全隕石を1ループで落下)/`meteorTap`/`resolveWave`/`missTarget`/`burst`(粒子)/`comboPop`。隕石は `#m-sky` に動的生成、`clearWave` で除去。
   - レベル(N5-N2)・カテゴリは開始画面で選択。プレイ中は `body.playing` でヘッダー等を隠し全画面化。
-  - ゲーム状態(ベストスコア・★・サウンド設定)は localStorage キー `jlpt-game-v1`（`jlpt-sr-v1` とは分離）。
+  - UIは英語話者向けで**英語のみ**（例文 `ex` のみ日本語＝学習コンテンツ）。開始画面に公式 jlpt.jp 準拠の各レベル能力記述(`LEVEL_DESC`)を表示。
+  - **公式JLPTは語彙/漢字/文法のリスト・数を非公開**（jlpt.jp FAQ）。よって「公式の語数」に合わせることは不可。能力記述と出題構成に準拠する方針（巷の概算値は非公式なので公式として提示しない）。
+  - Phase2: 穏やかな**ストリーク**(`computeStreak`、未達でも当日分は猶予・折れても咎めない)と**草風ヒートマップ**(`renderCalendar`、直近12週)。日次活動は1語回答ごとに `recordActivity` で記録。
+  - ゲーム状態(ベストスコア・★・サウンド設定・`history`日次活動)は localStorage キー `jlpt-game-v1`（`jlpt-sr-v1` とは分離）。
   - 音声は Web Speech API（ターゲット語の読み上げ＝ヒント、🔊で再生）+ WebAudioの軽いblip。サウンドはトグルで永続化。
 
 ## 開発上の注意
