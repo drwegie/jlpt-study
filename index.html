@@ -164,21 +164,40 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-play{padding:15px 40px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#1a1320;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
 .m-play:active{opacity:.85}
 .m-toggle{margin-top:16px;background:none;border:1px solid var(--border);color:var(--text-dim);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit}
-.m-sky{position:relative;flex:1;min-height:200px;background:radial-gradient(ellipse at 50% 0%,#241a3a,#140e1c 70%);border:1px solid var(--border-soft);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+/* Prompt bar */
+.m-prompt{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm)}
+.m-prompt-label{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em}
+.m-prompt b{font-size:18px;font-weight:700;color:var(--text)}
+.m-replay{margin-left:4px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-size:14px;width:32px;height:32px;border-radius:50%;cursor:pointer;font-family:inherit}
+.m-replay:active{background:var(--border)}
+
+.m-sky{position:relative;flex:1;min-height:220px;background:radial-gradient(ellipse at 50% 0%,#241a3a,#140e1c 70%);border:1px solid var(--border-soft);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
 .m-sky::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 20%,#cfc6ff,transparent),radial-gradient(1px 1px at 40% 60%,#fff,transparent),radial-gradient(1px 1px at 85% 70%,#cfc6ff,transparent),radial-gradient(1px 1px at 60% 85%,#fff,transparent);opacity:.5}
-.m-meteor{position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--surface-2);border:1.5px solid var(--accent);border-radius:14px;padding:11px 18px;text-align:center;box-shadow:0 0 20px rgba(179,164,255,.28);will-change:top;min-width:92px}
-.m-meteor.boom{animation:m-boom .4s ease forwards}
-.m-meteor.crash{animation:m-crash .4s ease forwards}
-@keyframes m-boom{to{transform:translateX(-50%) scale(1.7);opacity:0}}
-@keyframes m-crash{to{transform:translateX(-50%) scale(.6) rotate(8deg);opacity:0}}
-.m-jp{font-size:30px;font-weight:700;line-height:1.1}
-.m-kana{font-size:13px;color:var(--text-dim);margin-top:2px}
-.m-ground{position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--n2),var(--n2) 8px,transparent 8px,transparent 16px);opacity:.55}
-.m-sky.flash{animation:m-flash .35s ease}
-@keyframes m-flash{0%{box-shadow:inset 0 0 0 3px var(--n2)}100%{box-shadow:inset 0 0 0 0 transparent}}
-.m-opts .opt{text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center}
+.m-meteor{position:absolute;top:0;transform:translateX(-50%);background:var(--surface-2);border:1.5px solid var(--accent);border-radius:14px;padding:9px 14px;text-align:center;box-shadow:0 0 18px rgba(179,164,255,.28);will-change:top;min-width:74px;cursor:pointer;z-index:2}
+.m-meteor::after{content:"";position:absolute;left:50%;top:-14px;width:3px;height:14px;transform:translateX(-50%);background:linear-gradient(180deg,transparent,var(--accent));border-radius:2px;opacity:.7}
+.m-meteor.boom{animation:m-boom .4s ease forwards;pointer-events:none}
+.m-meteor.crash{animation:m-crash .45s ease forwards;pointer-events:none}
+.m-meteor.bad{animation:m-bad .4s ease forwards;pointer-events:none;border-color:var(--n2)}
+.m-meteor.show{border-color:var(--n4);box-shadow:0 0 24px rgba(52,192,138,.6);z-index:3}
+@keyframes m-boom{to{transform:translateX(-50%) scale(1.8);opacity:0;box-shadow:0 0 40px var(--accent)}}
+@keyframes m-crash{to{transform:translateX(-50%) translateY(14px) scale(.55) rotate(8deg);opacity:0}}
+@keyframes m-bad{50%{transform:translateX(-50%) scale(1.1)}to{transform:translateX(-50%) scale(.6);opacity:0}}
+.m-jp{font-size:24px;font-weight:700;line-height:1.1}
+.m-kana{font-size:11px;color:var(--text-dim);margin-top:1px}
+.m-ground{position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--n2),var(--n2) 8px,transparent 8px,transparent 16px);opacity:.55;z-index:3}
+.m-sky.flash{animation:m-flash .4s ease}
+@keyframes m-flash{0%,100%{box-shadow:inset 0 0 0 0 transparent}25%{box-shadow:inset 0 0 0 3px var(--n2)}}
+.m-sky.shake{animation:m-shake .35s ease}
+@keyframes m-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+
+/* particles + combo pop */
+.m-particle{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:4;animation:m-pop .65s ease-out forwards}
+@keyframes m-pop{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.m-pop-text{position:absolute;left:50%;top:38%;transform:translateX(-50%);font-size:26px;font-weight:800;color:var(--accent);text-shadow:0 0 18px rgba(179,164,255,.6);pointer-events:none;z-index:5;animation:m-poptext .8s ease-out forwards}
+@keyframes m-poptext{0%{transform:translateX(-50%) scale(.5);opacity:0}25%{transform:translateX(-50%) scale(1.15);opacity:1}100%{transform:translateX(-50%) translateY(-34px) scale(1);opacity:0}}
+
 .m-stars{font-size:36px;letter-spacing:5px;margin-bottom:10px;color:#f5c451}
-@media (prefers-reduced-motion:reduce){.m-meteor.boom,.m-meteor.crash,.m-sky.flash{animation-duration:.01s}}
+@media (prefers-reduced-motion:reduce){.m-meteor.boom,.m-meteor.crash,.m-meteor.bad,.m-sky.flash,.m-sky.shake,.m-particle,.m-pop-text{animation-duration:.01s}}
 
 /* Footer */
 .foot{margin-top:24px;padding-top:16px;border-top:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center}
@@ -228,14 +247,14 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-hud-item combo"><span>COMBO</span><b id="m-combo">0</b></div>
         <div class="m-hud-item"><span>BEST</span><b id="m-best">0</b></div>
       </div>
+      <div class="m-prompt">
+        <span class="m-prompt-label">Tap</span>
+        <b id="m-prompt-en"></b>
+        <button class="m-replay" id="m-replay" onclick="playPrompt()">🔊</button>
+      </div>
       <div class="m-sky" id="m-sky">
-        <div class="m-meteor" id="m-meteor">
-          <div class="m-jp" id="m-jp"></div>
-          <div class="m-kana" id="m-kana"></div>
-        </div>
         <div class="m-ground"></div>
       </div>
-      <div class="opts m-opts" id="m-opts"></div>
     </div>
 
     <div id="m-result" class="m-panel hidden">
@@ -430,13 +449,14 @@ function start(){
   refreshStats();
 }
 
-/* ---- Meteor Mode ---- */
+/* ---- Meteor Mode (multi-meteor waves) ---- */
 const GSTORE='jlpt-game-v1';
 const ROUND=10;
 let gdata={},soundOn=true;
-let mActive=false,mRAF=0,mStart=0,mFallMs=6000;
-let mItems=[],mIdx=0,mCur=null,mAnswered=false;
-let mScore=0,mCombo=0,mCorrect=0,mTotal=0;
+let mActive=false,mRAF=0,mTO=0;
+let mItems=[],mIdx=0,mTotal=0;
+let mScore=0,mCombo=0,mCorrect=0;
+let mWave=[],mTarget=null,mResolved=false;
 let actx=null;
 
 function gload(){
@@ -486,96 +506,147 @@ function startMeteor(){
   document.getElementById('m-combo').textContent='0';
   document.getElementById('m-best').textContent=bestScore();
   mActive=true;
-  spawnMeteor();
+  nextWave();
 }
 
-function spawnMeteor(){
+function nextWave(){
   if(!mActive)return;
   if(mIdx>=mItems.length){endMeteor();return;}
-  mCur=mItems[mIdx];mAnswered=false;mStart=0;
-  mFallMs=Math.max(2600,6000-mIdx*250-mCombo*120);
-  const m=document.getElementById('m-meteor');
-  m.className='m-meteor';m.style.top='0px';
-  document.getElementById('m-jp').textContent=mCur.jp;
-  document.getElementById('m-kana').textContent=mCur.kana||'';
-  buildMeteorOpts(mCur);
-  if(soundOn)say(mCur.jp,'ja-JP');
+  clearWave();
+  mResolved=false;
+  mTarget=mItems[mIdx];
+  document.getElementById('m-prompt-en').textContent=mTarget.en;
+
+  const pool=cards();
+  const count=Math.min(4,pool.length);
+  const distractors=shuffle(pool.filter(x=>x.id!==mTarget.id)).slice(0,count-1);
+  const entries=shuffle([mTarget,...distractors]);
+  const lanes=shuffle(entries.map((_,i)=>Math.round((i+0.5)/count*100)));
+  const sky=document.getElementById('m-sky');
+  const base=Math.max(3400,7000-mIdx*220-mCombo*90);
+  const now=performance.now();
+
+  mWave=entries.map((item,i)=>{
+    const el=document.createElement('div');
+    el.className='m-meteor';
+    el.style.left=Math.max(13,Math.min(87,lanes[i]+(Math.random()*10-5)))+'%';
+    el.innerHTML='<div class="m-jp">'+item.jp+'</div>'+(item.kana?'<div class="m-kana">'+item.kana+'</div>':'');
+    const o={el,item,isTarget:item.id===mTarget.id,startT:now+Math.random()*1000,fallMs:base*(0.85+Math.random()*0.3),landed:false};
+    el.onclick=()=>meteorTap(o);
+    sky.appendChild(el);
+    return o;
+  });
+  if(soundOn)say(mTarget.jp,'ja-JP');
   mRAF=requestAnimationFrame(mLoop);
 }
 
-function buildMeteorOpts(item){
-  const c=document.getElementById('m-opts');
-  c.innerHTML='';
-  const opts=shuffle([item,...shuffle(cards().filter(x=>x.id!==item.id)).slice(0,3)]);
-  opts.forEach(o=>{
-    const b=document.createElement('button');
-    b.className='opt';b.textContent=o.en;
-    b.onclick=()=>meteorAnswer(b,o.id===item.id);
-    c.appendChild(b);
-  });
-}
+function playPrompt(){if(mTarget)say(mTarget.jp,'ja-JP');}
 
 function mLoop(ts){
-  if(!mActive)return;
-  if(!mStart)mStart=ts;
+  if(!mActive||mResolved)return;
   const sky=document.getElementById('m-sky');
-  const m=document.getElementById('m-meteor');
-  const maxY=sky.clientHeight-m.offsetHeight-8;
-  const p=(ts-mStart)/mFallMs;
-  m.style.top=Math.min(maxY,p*maxY)+'px';
-  if(p>=1){meteorMiss();return;}
+  const maxY=sky.clientHeight-8;
+  for(const o of mWave){
+    if(o.landed)continue;
+    const p=(ts-o.startT)/o.fallMs;
+    const h=o.el.offsetHeight;
+    o.el.style.top=(p*(maxY-h))+'px';
+    if(p>=1){
+      o.landed=true;
+      if(o.isTarget){missTarget();return;}
+      o.el.classList.add('crash');
+    }
+  }
   mRAF=requestAnimationFrame(mLoop);
 }
 
-function meteorAnswer(btn,ok){
-  if(mAnswered||!mActive)return;mAnswered=true;
-  cancelAnimationFrame(mRAF);
-  const opts=document.getElementById('m-opts');
-  opts.querySelectorAll('button').forEach(b=>b.onclick=null);
-  if(ok){
-    const m=document.getElementById('m-meteor');
-    const sky=document.getElementById('m-sky');
-    const maxY=sky.clientHeight-m.offsetHeight-8;
-    const top=parseFloat(m.style.top)||0;
-    const speed=maxY?1-top/maxY:1;       /* caught early -> closer to 1 */
-    btn.classList.add('correct');
-    m.classList.add('boom');
+function meteorTap(o){
+  if(mResolved||!mActive||o.landed)return;
+  o.isTarget?resolveWave(true,o):resolveWave(false,o);
+}
+
+function resolveWave(success,o){
+  mResolved=true;cancelAnimationFrame(mRAF);
+  const sky=document.getElementById('m-sky');
+  const maxY=sky.clientHeight-8;
+  if(success){
+    const top=parseFloat(o.el.style.top)||0;
+    const speed=maxY?1-top/maxY:1;
+    o.el.classList.add('boom');
+    burst(o.el,'var(--accent)');
     mCorrect++;mCombo++;
-    mScore+=10+Math.round(speed*10)+(mCombo-1)*5;
-    update(mCur.id,speed>0.5?3:2);
+    mScore+=10+Math.round(speed*12)+(mCombo-1)*5;
+    update(mTarget.id,speed>0.5?3:2);
     if(soundOn)blip(660);
+    if(mCombo>=3&&mCombo%3===0)comboPop(mCombo+' COMBO!');
   }else{
-    btn.classList.add('wrong');
-    opts.querySelectorAll('button').forEach(b=>{if(b.textContent===mCur.en)b.classList.add('correct');});
-    failMeteor();
+    o.el.classList.add('bad');
+    const tgt=mWave.find(x=>x.isTarget);
+    if(tgt)tgt.el.classList.add('show');
+    mCombo=0;
+    update(mTarget.id,0);
+    shakeSky();
+    if(soundOn)blip(150);
   }
   document.getElementById('m-score').textContent=mScore;
   document.getElementById('m-combo').textContent=mCombo;
   mIdx++;
-  setTimeout(spawnMeteor,750);
+  mTO=setTimeout(nextWave,success?650:950);
 }
 
-function meteorMiss(){
-  if(mAnswered||!mActive)return;mAnswered=true;
-  const opts=document.getElementById('m-opts');
-  opts.querySelectorAll('button').forEach(b=>{b.onclick=null;if(b.textContent===mCur.en)b.classList.add('correct');});
-  document.getElementById('m-meteor').classList.add('crash');
-  failMeteor();
+function missTarget(){
+  if(mResolved)return;
+  mResolved=true;cancelAnimationFrame(mRAF);
+  const tgt=mWave.find(x=>x.isTarget);
+  if(tgt)tgt.el.classList.add('crash');
+  mCombo=0;
+  update(mTarget.id,0);
+  shakeSky();
+  if(soundOn)blip(150);
   document.getElementById('m-combo').textContent=mCombo;
   mIdx++;
-  setTimeout(spawnMeteor,750);
+  mTO=setTimeout(nextWave,950);
 }
 
-function failMeteor(){
-  mCombo=0;
-  update(mCur.id,0);
+function shakeSky(){
   const sky=document.getElementById('m-sky');
-  sky.classList.remove('flash');void sky.offsetWidth;sky.classList.add('flash');
-  if(soundOn)blip(150);
+  sky.classList.remove('flash','shake');void sky.offsetWidth;
+  sky.classList.add('flash','shake');
+}
+
+function clearWave(){
+  const sky=document.getElementById('m-sky');
+  sky.querySelectorAll('.m-meteor,.m-particle,.m-pop-text').forEach(e=>e.remove());
+  mWave=[];
+}
+
+function burst(el,color){
+  const sky=document.getElementById('m-sky');
+  const sr=sky.getBoundingClientRect(),er=el.getBoundingClientRect();
+  const cx=er.left-sr.left+er.width/2,cy=er.top-sr.top+er.height/2;
+  for(let i=0;i<12;i++){
+    const p=document.createElement('span');
+    p.className='m-particle';
+    const ang=Math.random()*6.28,dist=30+Math.random()*55;
+    p.style.left=cx+'px';p.style.top=cy+'px';
+    p.style.background=i%2?color:'#f5c451';
+    p.style.setProperty('--dx',Math.cos(ang)*dist+'px');
+    p.style.setProperty('--dy',Math.sin(ang)*dist+'px');
+    sky.appendChild(p);
+    setTimeout(()=>p.remove(),700);
+  }
+}
+
+function comboPop(text){
+  const sky=document.getElementById('m-sky');
+  const t=document.createElement('div');
+  t.className='m-pop-text';t.textContent=text;
+  sky.appendChild(t);
+  setTimeout(()=>t.remove(),800);
 }
 
 function endMeteor(){
-  mActive=false;cancelAnimationFrame(mRAF);
+  mActive=false;cancelAnimationFrame(mRAF);clearTimeout(mTO);clearWave();
   document.body.classList.remove('playing');
   const acc=mTotal?mCorrect/mTotal:0;
   const stars=acc>=0.9?3:acc>=0.7?2:acc>=0.4?1:0;
@@ -590,7 +661,7 @@ function endMeteor(){
   refreshStats();
 }
 
-function stopMeteor(){mActive=false;cancelAnimationFrame(mRAF);}
+function stopMeteor(){mActive=false;cancelAnimationFrame(mRAF);clearTimeout(mTO);clearWave();}
 
 function blip(freq){
   if(!soundOn)return;
