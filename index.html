@@ -168,6 +168,8 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-panel{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#140e1c,#241a2e);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px;text-align:center;overflow-y:auto}
 .m-inner{margin:auto;width:100%;max-width:380px}
 .m-level-desc{font-size:12px;color:var(--accent);font-weight:600;line-height:1.5;max-width:340px;margin:0 auto 12px}
+.m-hint{font-size:12px;color:var(--text-faint);margin:2px 0 0;cursor:pointer}
+.m-hint b{color:var(--accent);font-weight:600}
 .m-source{font-size:10px;color:var(--text-faint);line-height:1.5;max-width:320px;margin:16px auto 0}
 .m-panel .big{font-size:40px;margin-bottom:6px}
 .m-panel h3{font-size:20px;font-weight:700;margin-bottom:8px}
@@ -255,6 +257,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
           <button class="cat" data-cat="hiragana" onclick="setCat('hiragana')">Kana</button>
           <button class="cat" data-cat="kanji" onclick="setCat('kanji')">Kanji</button>
         </div>
+        <p class="m-hint" onclick="beginnerStart()">New to Japanese? <b>Learn Kana first →</b></p>
         <div class="m-summary" id="m-summary"></div>
         <div class="m-prog-bar"><div class="m-prog-fill" id="m-prog-fill" style="width:0%"></div></div>
         <p style="margin:18px 0 6px"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
@@ -1235,6 +1238,8 @@ function renderLearn(){
 function learnNext(){if(mLearnIdx<mLearn.length-1){mLearnIdx++;renderLearn();}}
 function learnPrev(){if(mLearnIdx>0){mLearnIdx--;renderLearn();}}
 function closeLearn(){document.getElementById('m-learn').classList.add('hidden');showMeteorStart();}
+/* beginner shortcut: jump to N5 Kana and start learning the script */
+function beginnerStart(){setLevel('N5');setCat('hiragana');openLearn();}
 
 function mLoop(ts){
   if(!mActive||mResolved)return;
