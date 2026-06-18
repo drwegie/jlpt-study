@@ -235,9 +235,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
   <div id="meteor-area">
     <div id="m-start" class="m-panel">
       <div class="m-inner">
-        <div class="big">🌠</div>
         <p class="m-level-desc" id="m-level-desc"></p>
-        <p>Tap the falling word that matches the meaning shown. Right or wrong, every answer feeds your spaced-repetition review.</p>
         <div class="cats" id="cats">
           <button class="cat on" data-cat="vocab" onclick="setCat('vocab')">Vocabulary</button>
           <button class="cat" data-cat="grammar" onclick="setCat('grammar')">Grammar</button>
@@ -246,10 +244,10 @@ body.playing #top-chrome,body.playing .foot{display:none}
         </div>
         <div class="m-summary" id="m-summary"></div>
         <div class="m-prog-bar"><div class="m-prog-fill" id="m-prog-fill" style="width:0%"></div></div>
+        <p style="margin:18px 0 6px"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
+        <button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button>
         <div class="m-streak" id="m-streak"></div>
         <div class="m-cal" id="m-cal"></div>
-        <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
-        <div><button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button></div>
         <p class="m-source">Word &amp; kanji lists are compiled from common JLPT study references and are unofficial — the JLPT does not publish official content lists. Level grouping is approximate.</p>
       </div>
     </div>
