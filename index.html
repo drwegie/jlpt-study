@@ -856,11 +856,35 @@ function update(id,q){
 function cards(){return(DATA[level]&&DATA[level][cat])||[];}
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);}
 
+/* pick the smoothest Japanese voice the device offers (enhanced/premium/Siri/neural first) */
+let jaVoice=null;
+function pickJaVoice(){
+  if(!window.speechSynthesis)return null;
+  const ja=speechSynthesis.getVoices().filter(v=>/^ja(-|_|$)/i.test(v.lang)||/ja-?jp/i.test(v.lang));
+  if(!ja.length)return null;
+  const score=v=>{
+    const n=(v.name+' '+(v.voiceURI||'')).toLowerCase();
+    let s=0;
+    if(/premium|enhanced/.test(n))s+=6;
+    if(/siri/.test(n))s+=5;
+    if(/neural|natural/.test(n))s+=5;
+    if(/kyoko|o-?ren|otoya|hattori|sara|nanami|keita/.test(n))s+=2;
+    if(!v.localService)s+=1;
+    return s;
+  };
+  return ja.slice().sort((a,b)=>score(b)-score(a))[0];
+}
+if(window.speechSynthesis){
+  jaVoice=pickJaVoice();
+  speechSynthesis.onvoiceschanged=()=>{jaVoice=pickJaVoice();};
+}
 function say(text,lang){
   if(!text||!window.speechSynthesis)return;
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang;u.rate=0.85;
+  u.lang=lang;
+  if(/^ja/i.test(lang)){if(!jaVoice)jaVoice=pickJaVoice();if(jaVoice)u.voice=jaVoice;}
+  u.rate=0.92;u.pitch=1;
   speechSynthesis.speak(u);
 }
 
