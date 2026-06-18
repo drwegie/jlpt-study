@@ -210,6 +210,17 @@ body.playing #top-chrome,body.playing .foot{display:none}
 @keyframes m-poptext{0%{transform:translateX(-50%) scale(.5);opacity:0}25%{transform:translateX(-50%) scale(1.15);opacity:1}100%{transform:translateX(-50%) translateY(-34px) scale(1);opacity:0}}
 
 .m-stars{font-size:36px;letter-spacing:5px;margin-bottom:10px;color:#f5c451}
+
+/* Learn (study) mode */
+.m-learn-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--text-faint)}
+.m-learn-x{background:none;border:none;color:var(--text-dim);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.m-learn-card{background:linear-gradient(180deg,#241a2e,#1d1526);border:1px solid var(--border-soft);border-radius:var(--radius);padding:26px 18px;cursor:pointer;user-select:none}
+.m-learn-jp{font-size:40px;font-weight:700;line-height:1.1}
+.m-learn-kana{font-size:15px;color:var(--text-dim);margin-top:5px}
+.m-learn-card .m-replay{margin-top:12px}
+.m-learn-mean{font-size:21px;font-weight:600;margin-top:16px}
+.m-learn-ex{font-size:14px;color:var(--text-dim);margin-top:10px;line-height:1.7}
+.m-learn-nav{display:flex;gap:10px;justify-content:center;margin-top:14px}
 @media (prefers-reduced-motion:reduce){.m-meteor.boom,.m-meteor.crash,.m-meteor.bad,.m-sky.flash,.m-sky.shake,.m-particle,.m-pop-text{animation-duration:.01s}}
 
 /* Footer */
@@ -247,6 +258,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-summary" id="m-summary"></div>
         <div class="m-prog-bar"><div class="m-prog-fill" id="m-prog-fill" style="width:0%"></div></div>
         <p style="margin:18px 0 6px"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
+        <button class="m-toggle" onclick="openLearn()">📖 Learn words</button>
         <button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button>
         <div class="m-streak" id="m-streak"></div>
         <div class="m-cal" id="m-cal"></div>
@@ -276,6 +288,24 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <h3 id="m-result-title"></h3>
         <p id="m-result-sub"></p>
         <button class="m-play" onclick="startMeteor()">Play again</button>
+      </div>
+    </div>
+
+    <div id="m-learn" class="m-panel hidden">
+      <div class="m-inner">
+        <div class="m-learn-top"><span id="m-learn-count"></span><button class="m-learn-x" onclick="closeLearn()">✕ Close</button></div>
+        <div class="m-learn-card" onclick="learnNext()">
+          <div class="m-learn-jp" id="m-learn-jp"></div>
+          <div class="m-learn-kana" id="m-learn-kana"></div>
+          <button class="m-replay" onclick="event.stopPropagation();sayItem(mLearn[mLearnIdx])">🔊</button>
+          <div class="m-learn-mean" id="m-learn-mean"></div>
+          <div class="m-learn-ex" id="m-learn-ex"></div>
+        </div>
+        <div class="m-learn-nav">
+          <button class="m-toggle" onclick="learnPrev()">◀ Prev</button>
+          <button class="m-toggle" onclick="learnNext()">Next ▶</button>
+        </div>
+        <p style="margin:14px 0 0"><button class="m-play" onclick="startMeteor()">▶ Play</button></p>
       </div>
     </div>
   </div>
@@ -990,6 +1020,7 @@ let mActive=false,mRAF=0,mTO=0;
 let mItems=[],mIdx=0,mTotal=0;
 let mScore=0,mCombo=0,mCorrect=0;
 let mWave=[],mTarget=null,mResolved=false,mMode='m2j';
+let mLearn=[],mLearnIdx=0;
 let actx=null;
 
 function gload(){
@@ -1018,6 +1049,7 @@ function showMeteorStart(){
   document.body.classList.remove('playing');
   document.getElementById('m-field').classList.add('hidden');
   document.getElementById('m-result').classList.add('hidden');
+  document.getElementById('m-learn').classList.add('hidden');
   document.getElementById('m-start').classList.remove('hidden');
   document.getElementById('m-best').textContent=bestScore();
   updateSoundBtn();
@@ -1036,6 +1068,7 @@ function startMeteor(){
   mIdx=0;mScore=0;mCombo=0;mCorrect=0;mTotal=mItems.length;
   document.getElementById('m-start').classList.add('hidden');
   document.getElementById('m-result').classList.add('hidden');
+  document.getElementById('m-learn').classList.add('hidden');
   document.getElementById('m-field').classList.remove('hidden');
   document.getElementById('m-score').textContent='0';
   document.getElementById('m-combo').textContent='0';
@@ -1088,6 +1121,32 @@ function nextWave(){
 function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 function playPrompt(){sayItem(mTarget);}
+
+/* ---- Learn (study) mode: preview words, new ones first ---- */
+function openLearn(){
+  const all=cards();if(!all.length)return;
+  const isNew=i=>{const c=mem[i.id];return !c||c.reps===0;};
+  mLearn=[...all.filter(isNew),...all.filter(i=>!isNew(i))];
+  mLearnIdx=0;
+  document.body.classList.remove('playing');
+  document.getElementById('m-start').classList.add('hidden');
+  document.getElementById('m-result').classList.add('hidden');
+  document.getElementById('m-field').classList.add('hidden');
+  document.getElementById('m-learn').classList.remove('hidden');
+  renderLearn();
+}
+function renderLearn(){
+  const it=mLearn[mLearnIdx];if(!it)return;
+  document.getElementById('m-learn-jp').textContent=it.jp;
+  document.getElementById('m-learn-kana').textContent=it.kana||'';
+  document.getElementById('m-learn-mean').textContent=it.en;
+  document.getElementById('m-learn-ex').textContent=it.ex||'';
+  document.getElementById('m-learn-count').textContent=(mLearnIdx+1)+' / '+mLearn.length;
+  if(soundOn)sayItem(it);
+}
+function learnNext(){if(mLearnIdx<mLearn.length-1){mLearnIdx++;renderLearn();}}
+function learnPrev(){if(mLearnIdx>0){mLearnIdx--;renderLearn();}}
+function closeLearn(){document.getElementById('m-learn').classList.add('hidden');showMeteorStart();}
 
 function mLoop(ts){
   if(!mActive||mResolved)return;
