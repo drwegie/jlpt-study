@@ -168,6 +168,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-panel{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#140e1c,#241a2e);border:1px solid var(--border-soft);border-radius:var(--radius);padding:20px;text-align:center;overflow-y:auto}
 .m-inner{margin:auto;width:100%;max-width:380px}
 .m-level-desc{font-size:12px;color:var(--accent);font-weight:600;line-height:1.5;max-width:340px;margin:0 auto 12px}
+.m-source{font-size:10px;color:var(--text-faint);line-height:1.5;max-width:320px;margin:16px auto 0}
 .m-panel .big{font-size:40px;margin-bottom:6px}
 .m-panel h3{font-size:20px;font-weight:700;margin-bottom:8px}
 .m-panel p{font-size:13px;color:var(--text-dim);line-height:1.6;max-width:340px;margin:0 auto 14px}
@@ -251,6 +252,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-cal" id="m-cal"></div>
         <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
         <div><button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button></div>
+        <p class="m-source">Word &amp; kanji lists are compiled from common JLPT study references and are unofficial — the JLPT does not publish official content lists. Level grouping is approximate.</p>
       </div>
     </div>
 
@@ -324,6 +326,19 @@ const DATA={
       {id:'n5v32',jp:'古い',kana:'ふるい',en:'old',ex:'古い建物です。'},
       {id:'n5v33',jp:'食べ物',kana:'たべもの',en:'food',ex:'食べ物が好きです。'},
       {id:'n5v34',jp:'飲み物',kana:'のみもの',en:'drink',ex:'飲み物を買います。'},
+      {id:'n5v35',jp:'朝',kana:'あさ',en:'morning',ex:'朝起きます。'},
+      {id:'n5v36',jp:'昼',kana:'ひる',en:'noon; daytime',ex:'昼ご飯を食べます。'},
+      {id:'n5v37',jp:'夜',kana:'よる',en:'night',ex:'夜寝ます。'},
+      {id:'n5v38',jp:'去年',kana:'きょねん',en:'last year',ex:'去年行きました。'},
+      {id:'n5v39',jp:'来年',kana:'らいねん',en:'next year',ex:'来年会いましょう。'},
+      {id:'n5v40',jp:'天気',kana:'てんき',en:'weather',ex:'いい天気です。'},
+      {id:'n5v41',jp:'名前',kana:'なまえ',en:'name',ex:'名前を書きます。'},
+      {id:'n5v42',jp:'国',kana:'くに',en:'country',ex:'どこの国ですか。'},
+      {id:'n5v43',jp:'町',kana:'まち',en:'town',ex:'町を歩きます。'},
+      {id:'n5v44',jp:'道',kana:'みち',en:'road; way',ex:'道を聞きます。'},
+      {id:'n5v45',jp:'駅',kana:'えき',en:'station',ex:'駅で待ちます。'},
+      {id:'n5v46',jp:'部屋',kana:'へや',en:'room',ex:'部屋を掃除します。'},
+      {id:'n5v47',jp:'飛行機',kana:'ひこうき',en:'airplane',ex:'飛行機に乗ります。'},
     ],
     grammar:[
       {id:'n5g1',jp:'〜は〜です',kana:'',en:'A is B',ex:'私は学生です。'},
@@ -462,6 +477,18 @@ const DATA={
       {id:'n4v29',jp:'決める',kana:'きめる',en:'to decide',ex:'日を決めます。'},
       {id:'n4v30',jp:'集める',kana:'あつめる',en:'to collect',ex:'切手を集めます。'},
       {id:'n4v31',jp:'比べる',kana:'くらべる',en:'to compare',ex:'二つを比べます。'},
+      {id:'n4v32',jp:'試験',kana:'しけん',en:'exam',ex:'試験を受けます。'},
+      {id:'n4v33',jp:'規則',kana:'きそく',en:'rule',ex:'規則を守ります。'},
+      {id:'n4v34',jp:'文化',kana:'ぶんか',en:'culture',ex:'日本の文化です。'},
+      {id:'n4v35',jp:'歴史',kana:'れきし',en:'history',ex:'歴史を学びます。'},
+      {id:'n4v36',jp:'社会',kana:'しゃかい',en:'society',ex:'社会に出ます。'},
+      {id:'n4v37',jp:'機会',kana:'きかい',en:'opportunity',ex:'いい機会です。'},
+      {id:'n4v38',jp:'興味',kana:'きょうみ',en:'interest',ex:'音楽に興味があります。'},
+      {id:'n4v39',jp:'材料',kana:'ざいりょう',en:'ingredients',ex:'材料を買います。'},
+      {id:'n4v40',jp:'道具',kana:'どうぐ',en:'tool',ex:'道具を使います。'},
+      {id:'n4v41',jp:'製品',kana:'せいひん',en:'product',ex:'新しい製品です。'},
+      {id:'n4v42',jp:'情報',kana:'じょうほう',en:'information',ex:'情報を集めます。'},
+      {id:'n4v43',jp:'関係',kana:'かんけい',en:'relationship',ex:'深い関係です。'},
     ],
     grammar:[
       {id:'n4g1',jp:'〜てから',kana:'',en:'after doing',ex:'ご飯を食べてから出かけます。'},
@@ -596,6 +623,18 @@ const DATA={
       {id:'n3v26',jp:'満足',kana:'まんぞく',en:'satisfaction',ex:'結果に満足します。'},
       {id:'n3v27',jp:'反対',kana:'はんたい',en:'opposition',ex:'計画に反対します。'},
       {id:'n3v28',jp:'賛成',kana:'さんせい',en:'agreement',ex:'意見に賛成します。'},
+      {id:'n3v29',jp:'評判',kana:'ひょうばん',en:'reputation',ex:'評判がいいです。'},
+      {id:'n3v30',jp:'印象',kana:'いんしょう',en:'impression',ex:'第一印象です。'},
+      {id:'n3v31',jp:'意識',kana:'いしき',en:'consciousness',ex:'意識がありません。'},
+      {id:'n3v32',jp:'習慣',kana:'しゅうかん',en:'habit; custom',ex:'早起きの習慣です。'},
+      {id:'n3v33',jp:'伝統',kana:'でんとう',en:'tradition',ex:'伝統を守ります。'},
+      {id:'n3v34',jp:'現実',kana:'げんじつ',en:'reality',ex:'現実は厳しいです。'},
+      {id:'n3v35',jp:'理想',kana:'りそう',en:'ideal',ex:'理想が高いです。'},
+      {id:'n3v36',jp:'能力',kana:'のうりょく',en:'ability',ex:'能力を高めます。'},
+      {id:'n3v37',jp:'責任',kana:'せきにん',en:'responsibility',ex:'責任を持ちます。'},
+      {id:'n3v38',jp:'義務',kana:'ぎむ',en:'duty',ex:'義務を果たします。'},
+      {id:'n3v39',jp:'権利',kana:'けんり',en:'right',ex:'権利を守ります。'},
+      {id:'n3v40',jp:'資料',kana:'しりょう',en:'materials; data',ex:'資料を集めます。'},
     ],
     grammar:[
       {id:'n3g1',jp:'〜によって',kana:'',en:'depending on; by',ex:'人によって違います。'},
@@ -714,6 +753,18 @@ const DATA={
       {id:'n2v28',jp:'順調',kana:'じゅんちょう',en:'smooth',ex:'順調に進みます。'},
       {id:'n2v29',jp:'深刻',kana:'しんこく',en:'serious',ex:'深刻な問題です。'},
       {id:'n2v30',jp:'貴重',kana:'きちょう',en:'valuable',ex:'貴重な経験です。'},
+      {id:'n2v31',jp:'仮説',kana:'かせつ',en:'hypothesis',ex:'仮説を立てます。'},
+      {id:'n2v32',jp:'観点',kana:'かんてん',en:'viewpoint',ex:'別の観点です。'},
+      {id:'n2v33',jp:'要因',kana:'よういん',en:'factor',ex:'主な要因です。'},
+      {id:'n2v34',jp:'背景',kana:'はいけい',en:'background',ex:'事件の背景です。'},
+      {id:'n2v35',jp:'前提',kana:'ぜんてい',en:'premise',ex:'前提が違います。'},
+      {id:'n2v36',jp:'根拠',kana:'こんきょ',en:'basis; grounds',ex:'根拠がありません。'},
+      {id:'n2v37',jp:'妥当',kana:'だとう',en:'reasonable; valid',ex:'妥当な判断です。'},
+      {id:'n2v38',jp:'膨大',kana:'ぼうだい',en:'enormous',ex:'膨大なデータです。'},
+      {id:'n2v39',jp:'潜在',kana:'せんざい',en:'latent',ex:'潜在的な力です。'},
+      {id:'n2v40',jp:'本質',kana:'ほんしつ',en:'essence',ex:'問題の本質です。'},
+      {id:'n2v41',jp:'相互',kana:'そうご',en:'mutual',ex:'相互に助けます。'},
+      {id:'n2v42',jp:'普遍',kana:'ふへん',en:'universal',ex:'普遍的な価値です。'},
     ],
     grammar:[
       {id:'n2g1',jp:'〜に際して',kana:'',en:'on the occasion of',ex:'出発に際して確認します。'},
