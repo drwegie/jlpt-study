@@ -789,17 +789,18 @@ function save(){
   try{localStorage.setItem(STORE,JSON.stringify(mem));}catch(e){}
 }
 function rec(id){
-  if(!mem[id]) mem[id]={iv:0,ef:2.5,due:Date.now()-1,reps:0};
+  if(!mem[id]) mem[id]={iv:0,ef:2.5,due:Date.now()-1,reps:0,lapses:0};
   return mem[id];
 }
 function isDue(id){return rec(id).due<=Date.now();}
+function lapses(id){return rec(id).lapses||0;}
 
-/* ---- SM-2 ---- */
+/* ---- SM-2 (with lapse tracking for leech prioritisation) ---- */
 function update(id,q){
   const c=rec(id);
   let ef=Math.max(1.3,c.ef+(0.1-(3-q)*(0.08+(3-q)*0.02)));
   let iv;
-  if(q<2){iv=1;c.reps=0;}
+  if(q<2){iv=1;c.reps=0;c.lapses=(c.lapses||0)+1;}
   else{c.reps++;iv=c.reps===1?1:c.reps===2?3:Math.round(c.iv*ef);}
   c.ef=ef;c.iv=iv;c.due=Date.now()+iv*DAY;
   mem[id]=c;save();
@@ -943,8 +944,10 @@ function startMeteor(){
   const pool=cards();
   if(pool.length<1)return;
   document.body.classList.add('playing');
-  const ordered=[...pool.filter(i=>isDue(i.id)).sort((a,b)=>rec(a.id).due-rec(b.id).due),
-                 ...pool.filter(i=>!isDue(i.id))];
+  /* surface frequently-missed words first: due items by lapses then due-date, then the rest by lapses */
+  const byLeech=(a,b)=>lapses(b.id)-lapses(a.id)||rec(a.id).due-rec(b.id).due;
+  const ordered=[...pool.filter(i=>isDue(i.id)).sort(byLeech),
+                 ...pool.filter(i=>!isDue(i.id)).sort((a,b)=>lapses(b.id)-lapses(a.id))];
   mItems=ordered.slice(0,Math.min(ROUND,ordered.length));
   mIdx=0;mScore=0;mCombo=0;mCorrect=0;mTotal=mItems.length;
   document.getElementById('m-start').classList.add('hidden');
