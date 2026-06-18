@@ -179,6 +179,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-prompt{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm)}
 .m-prompt-label{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em}
 .m-prompt b{font-size:18px;font-weight:700;color:var(--text)}
+.m-prompt-kana{font-weight:500;font-size:14px;color:var(--text-dim);margin-left:5px}
 .m-replay{margin-left:4px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);font-size:14px;width:32px;height:32px;border-radius:50%;cursor:pointer;font-family:inherit}
 .m-replay:active{background:var(--border)}
 
@@ -194,6 +195,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
 @keyframes m-crash{to{transform:translateX(-50%) translateY(14px) scale(.55) rotate(8deg);opacity:0}}
 @keyframes m-bad{50%{transform:translateX(-50%) scale(1.1)}to{transform:translateX(-50%) scale(.6);opacity:0}}
 .m-jp{font-size:24px;font-weight:700;line-height:1.1}
+.m-meteor .m-en{font-size:15px;font-weight:600;line-height:1.25;max-width:150px;white-space:normal}
 .m-kana{font-size:11px;color:var(--text-dim);margin-top:1px}
 .m-ground{position:absolute;left:0;right:0;bottom:0;height:4px;background:repeating-linear-gradient(90deg,var(--n2),var(--n2) 8px,transparent 8px,transparent 16px);opacity:.55;z-index:3}
 .m-sky.flash{animation:m-flash .4s ease}
@@ -259,7 +261,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-hud-item"><span>BEST</span><b id="m-best">0</b></div>
       </div>
       <div class="m-prompt">
-        <span class="m-prompt-label">Tap</span>
+        <span class="m-prompt-label" id="m-prompt-label">Tap</span>
         <b id="m-prompt-en"></b>
         <button class="m-replay" id="m-replay" onclick="playPrompt()">🔊</button>
       </div>
@@ -987,7 +989,7 @@ let gdata={},soundOn=true;
 let mActive=false,mRAF=0,mTO=0;
 let mItems=[],mIdx=0,mTotal=0;
 let mScore=0,mCombo=0,mCorrect=0;
-let mWave=[],mTarget=null,mResolved=false;
+let mWave=[],mTarget=null,mResolved=false,mMode='m2j';
 let actx=null;
 
 function gload(){
@@ -1048,7 +1050,16 @@ function nextWave(){
   clearWave();
   mResolved=false;
   mTarget=mItems[mIdx];
-  document.getElementById('m-prompt-en').textContent=mTarget.en;
+
+  /* vary the recall direction each wave (audio mode only when sound is on) */
+  const modes=soundOn?['m2j','j2m','a2m']:['m2j','j2m'];
+  mMode=modes[Math.floor(Math.random()*modes.length)];
+  const jpSide=(mMode==='m2j');            /* meteors are Japanese in m2j, English otherwise */
+  const lbl=document.getElementById('m-prompt-label');
+  const enb=document.getElementById('m-prompt-en');
+  if(mMode==='m2j'){lbl.textContent='Word for';enb.textContent=mTarget.en;}
+  else if(mMode==='j2m'){lbl.textContent='Meaning of';enb.innerHTML=esc(mTarget.jp)+(mTarget.kana?'<span class="m-prompt-kana">'+esc(mTarget.kana)+'</span>':'');}
+  else{lbl.textContent='Listen, tap meaning';enb.textContent='🔊';}
 
   const pool=cards();
   const count=Math.min(4,pool.length);
@@ -1063,7 +1074,9 @@ function nextWave(){
     const el=document.createElement('div');
     el.className='m-meteor';
     el.style.left=Math.max(13,Math.min(87,lanes[i]+(Math.random()*10-5)))+'%';
-    el.innerHTML='<div class="m-jp">'+item.jp+'</div>'+(item.kana?'<div class="m-kana">'+item.kana+'</div>':'');
+    el.innerHTML=jpSide
+      ?'<div class="m-jp">'+esc(item.jp)+'</div>'+(item.kana?'<div class="m-kana">'+esc(item.kana)+'</div>':'')
+      :'<div class="m-jp m-en">'+esc(item.en)+'</div>';
     const o={el,item,isTarget:item.id===mTarget.id,startT:now+Math.random()*1000,fallMs:base*(0.85+Math.random()*0.3),landed:false};
     el.onclick=()=>meteorTap(o);
     sky.appendChild(el);
@@ -1072,6 +1085,7 @@ function nextWave(){
   if(soundOn)sayItem(mTarget);
   mRAF=requestAnimationFrame(mLoop);
 }
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 function playPrompt(){sayItem(mTarget);}
 
