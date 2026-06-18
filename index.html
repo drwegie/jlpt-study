@@ -887,6 +887,17 @@ function say(text,lang){
   u.rate=0.92;u.pitch=1;
   speechSynthesis.speak(u);
 }
+/* speak the correct reading rather than the (ambiguous) kanji form, per category */
+function sayItem(item){
+  if(!item)return;
+  const k=(item.kana||'').trim();
+  let text;
+  if(cat==='hiragana')text=item.jp;                       /* kana char; its kana field is romaji */
+  else if(cat==='kanji')text=(k.split(/[・･、／/,]/)[0]||'').trim()||item.jp; /* first on/kun reading */
+  else if(k&&/^[぀-ヿｦ-ﾟ]+$/.test(k))text=k;  /* clean kana reading -> fixes 来る->くる */
+  else text=item.jp;                                       /* grammar / fallback */
+  say(text,'ja-JP');
+}
 
 /* ---- official JLPT level competence (jlpt.jp) ---- */
 const LEVEL_DESC={
@@ -1058,11 +1069,11 @@ function nextWave(){
     sky.appendChild(el);
     return o;
   });
-  if(soundOn)say(mTarget.jp,'ja-JP');
+  if(soundOn)sayItem(mTarget);
   mRAF=requestAnimationFrame(mLoop);
 }
 
-function playPrompt(){if(mTarget)say(mTarget.jp,'ja-JP');}
+function playPrompt(){sayItem(mTarget);}
 
 function mLoop(ts){
   if(!mActive||mResolved)return;
