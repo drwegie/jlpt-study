@@ -1,5 +1,5 @@
-/* JLPT Study service worker — offline app shell + best-effort streak reminder */
-const CACHE = 'jlpt-study-v1';
+/* JLPT Study service worker — offline support, network-first so deploys show immediately */
+const CACHE = 'jlpt-study-v3';
 const ASSETS = ['.', 'index.html', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {
@@ -18,31 +18,14 @@ self.addEventListener('activate', e => {
   );
 });
 
-/* cache-first for GET, fall back to cached index.html when offline */
+/* network-first: fresh content when online (latest deploy), cache fallback when offline */
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(cached =>
-      cached || fetch(e.request).then(resp => {
-        const copy = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
-        return resp;
-      }).catch(() => caches.match('index.html'))
-    )
+    fetch(e.request).then(resp => {
+      const copy = resp.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      return resp;
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('index.html')))
   );
-});
-
-/* daily reminder when the browser supports Periodic Background Sync (Chrome / installed PWA) */
-self.addEventListener('periodicsync', e => {
-  if (e.tag === 'streak-reminder') {
-    e.waitUntil(self.registration.showNotification('JLPT Study', {
-      body: 'Keep your streak alive — time for a quick round!',
-      icon: 'icon.svg', badge: 'icon.svg', tag: 'streak'
-    }));
-  }
-});
-
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  e.waitUntil(self.clients.openWindow('.'));
 });

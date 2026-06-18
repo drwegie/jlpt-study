@@ -46,7 +46,6 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .app-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
 .app-title{font-size:19px;font-weight:700;letter-spacing:-0.02em}
 .app-title span{color:var(--accent)}
-.app-tag{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em}
 
 /* Level row */
 .levels{display:flex;gap:8px;margin-bottom:0}
@@ -222,7 +221,6 @@ body.playing #top-chrome,body.playing .foot{display:none}
   <div id="top-chrome">
     <div class="app-head">
       <div class="app-title">JLPT <span>Study</span></div>
-      <div class="app-tag">🌠 meteor</div>
     </div>
 
     <div class="levels" id="levels">
@@ -238,7 +236,6 @@ body.playing #top-chrome,body.playing .foot{display:none}
     <div id="m-start" class="m-panel">
       <div class="m-inner">
         <div class="big">🌠</div>
-        <h3>Meteor Mode</h3>
         <p class="m-level-desc" id="m-level-desc"></p>
         <p>Tap the falling word that matches the meaning shown. Right or wrong, every answer feeds your spaced-repetition review.</p>
         <div class="cats" id="cats">
@@ -252,10 +249,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-streak" id="m-streak"></div>
         <div class="m-cal" id="m-cal"></div>
         <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
-        <div>
-          <button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button>
-          <button class="m-toggle" id="m-remind" onclick="toggleReminder()">🔕 Reminders: Off</button>
-        </div>
+        <div><button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button></div>
         <p class="m-source">Word &amp; kanji lists are compiled from common JLPT study references and are unofficial — the JLPT does not publish official content lists. Level grouping is approximate.</p>
       </div>
     </div>
@@ -984,27 +978,6 @@ function updateSoundBtn(){
 }
 function toggleSound(){soundOn=!soundOn;gsave();updateSoundBtn();}
 
-function updateRemindBtn(){
-  const b=document.getElementById('m-remind');
-  if(b)b.textContent=(gdata.reminder?'🔔':'🔕')+' Reminders: '+(gdata.reminder?'On':'Off');
-}
-async function toggleReminder(){
-  if(!('Notification' in window)){alert('Notifications are not supported on this browser.');return;}
-  if(gdata.reminder){gdata.reminder=false;gsave();updateRemindBtn();return;}
-  let perm=Notification.permission;
-  if(perm!=='granted')perm=await Notification.requestPermission();
-  if(perm!=='granted'){updateRemindBtn();return;}
-  gdata.reminder=true;gsave();updateRemindBtn();
-  /* best-effort daily reminder; only Chrome/installed PWAs support periodic sync */
-  try{
-    const reg=await navigator.serviceWorker.ready;
-    if('periodicSync' in reg){
-      const st=await navigator.permissions.query({name:'periodic-background-sync'});
-      if(st.state==='granted')await reg.periodicSync.register('streak-reminder',{minInterval:22*60*60*1000});
-    }
-  }catch(e){}
-}
-
 function showMeteorStart(){
   stopMeteor();
   document.body.classList.remove('playing');
@@ -1013,7 +986,6 @@ function showMeteorStart(){
   document.getElementById('m-start').classList.remove('hidden');
   document.getElementById('m-best').textContent=bestScore();
   updateSoundBtn();
-  updateRemindBtn();
   refreshStats();
 }
 
