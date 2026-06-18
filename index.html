@@ -1216,8 +1216,7 @@ function playPrompt(){sayItem(mTarget);}
 /* ---- Learn (study) mode: preview words, new ones first ---- */
 function openLearn(){
   const all=cards();if(!all.length)return;
-  const isNew=i=>{const c=mem[i.id];return !c||c.reps===0;};
-  mLearn=[...all.filter(isNew),...all.filter(i=>!isNew(i))];
+  mLearn=all.slice();   /* keep curriculum order (e.g. kana あ→ん); SRS ordering is only for the game */
   mLearnIdx=0;
   document.body.classList.remove('playing');
   document.getElementById('m-start').classList.add('hidden');
