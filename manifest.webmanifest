@@ -1,0 +1,14 @@
+{
+  "name": "JLPT Study — Meteor Mode",
+  "short_name": "JLPT Study",
+  "description": "Gamified JLPT N5–N2 vocabulary, kanji, grammar and kana practice with spaced repetition.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1320",
+  "theme_color": "#1a1320",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

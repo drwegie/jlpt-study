@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="JLPT">
 <meta name="theme-color" content="#1a1320">
 <title>JLPT Study</title>
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%237F77DD'/%3E%3Ctext x='90' y='118' font-size='80' font-family='sans-serif' font-weight='700' fill='white' text-anchor='middle'%3E語%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -174,7 +175,7 @@ body.playing #top-chrome,body.playing .foot{display:none}
 .m-panel p{font-size:13px;color:var(--text-dim);line-height:1.6;max-width:340px;margin:0 auto 14px}
 .m-play{padding:15px 40px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#1a1320;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
 .m-play:active{opacity:.85}
-.m-toggle{margin-top:16px;background:none;border:1px solid var(--border);color:var(--text-dim);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit}
+.m-toggle{margin:16px 4px 0;background:none;border:1px solid var(--border);color:var(--text-dim);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit}
 /* Prompt bar */
 .m-prompt{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm)}
 .m-prompt-label{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em}
@@ -251,7 +252,10 @@ body.playing #top-chrome,body.playing .foot{display:none}
         <div class="m-streak" id="m-streak"></div>
         <div class="m-cal" id="m-cal"></div>
         <p style="margin:18px 0 0"><button class="m-play" onclick="startMeteor()">▶ Start</button></p>
-        <div><button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button></div>
+        <div>
+          <button class="m-toggle" id="m-sound" onclick="toggleSound()">🔊 Sound: On</button>
+          <button class="m-toggle" id="m-remind" onclick="toggleReminder()">🔕 Reminders: Off</button>
+        </div>
         <p class="m-source">Word &amp; kanji lists are compiled from common JLPT study references and are unofficial — the JLPT does not publish official content lists. Level grouping is approximate.</p>
       </div>
     </div>
@@ -980,6 +984,27 @@ function updateSoundBtn(){
 }
 function toggleSound(){soundOn=!soundOn;gsave();updateSoundBtn();}
 
+function updateRemindBtn(){
+  const b=document.getElementById('m-remind');
+  if(b)b.textContent=(gdata.reminder?'🔔':'🔕')+' Reminders: '+(gdata.reminder?'On':'Off');
+}
+async function toggleReminder(){
+  if(!('Notification' in window)){alert('Notifications are not supported on this browser.');return;}
+  if(gdata.reminder){gdata.reminder=false;gsave();updateRemindBtn();return;}
+  let perm=Notification.permission;
+  if(perm!=='granted')perm=await Notification.requestPermission();
+  if(perm!=='granted'){updateRemindBtn();return;}
+  gdata.reminder=true;gsave();updateRemindBtn();
+  /* best-effort daily reminder; only Chrome/installed PWAs support periodic sync */
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    if('periodicSync' in reg){
+      const st=await navigator.permissions.query({name:'periodic-background-sync'});
+      if(st.state==='granted')await reg.periodicSync.register('streak-reminder',{minInterval:22*60*60*1000});
+    }
+  }catch(e){}
+}
+
 function showMeteorStart(){
   stopMeteor();
   document.body.classList.remove('playing');
@@ -988,6 +1013,7 @@ function showMeteorStart(){
   document.getElementById('m-start').classList.remove('hidden');
   document.getElementById('m-best').textContent=bestScore();
   updateSoundBtn();
+  updateRemindBtn();
   refreshStats();
 }
 
@@ -1187,6 +1213,7 @@ function resetAll(){
 
 /* ---- boot ---- */
 load();gload();start();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});
 </script>
 </body>
 </html>
